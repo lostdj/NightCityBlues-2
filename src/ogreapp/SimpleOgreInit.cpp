@@ -60,13 +60,13 @@ namespace OgreEasy
 		mWindow = NULL;
 		mRoot.reset();// I was not obliged to do that...
 
-		if(renderer != NULL)
-			mRoot->getSingleton().uninstallPlugin(renderer);
-		if(sceneManager != NULL)
-			mRoot->getSingleton().uninstallPlugin(sceneManager);
+		//if(renderer != NULL)
+		//	mRoot->getSingleton().uninstallPlugin(renderer);
+		//if(sceneManager != NULL)
+		//	mRoot->getSingleton().uninstallPlugin(sceneManager);
 
-		delete renderer;
-		delete sceneManager;
+		//delete renderer;
+		//delete sceneManager;
 	}
 
 
