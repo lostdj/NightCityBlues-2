@@ -41,6 +41,7 @@
 // Then I will still have to do the include corresponding to these classes in the .cpp file.
 namespace Ogre
 {
+	class Plugin;
 	class RenderWindow;
 	class RenderSystem;
 	class Root;
@@ -62,6 +63,10 @@ namespace OgreEasy
 		// This might happen when people make simple mistakes (eg. putting it directly in a std::vector ...).
 		SimpleOgreInit(const SimpleOgreInit& s);
 		SimpleOgreInit& operator=(const SimpleOgreInit& s);
+
+		Ogre::Plugin *renderer;
+		Ogre::Plugin *sceneManager;
+
 	public:
 		// The constructor does nothing but initialisation to NULL or empty values.
 		SimpleOgreInit();

@@ -6,9 +6,9 @@
 
 //
 #define OGRE_STATIC_LIB
-#include <OGRE/OgreRoot.h>
-#include <OGRE/OgreRenderWindow.h>
-#include <OGRE/OgreWindowEventUtilities.h>
+#include <OgreRoot.h>
+#include <OgreRenderWindow.h>
+#include <OgreWindowEventUtilities.h>
 
 // Mad Marx Tutorials.
 #include "ogreapp/SimpleOgreInit.h"

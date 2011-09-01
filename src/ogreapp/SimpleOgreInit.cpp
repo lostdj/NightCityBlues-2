@@ -31,9 +31,12 @@
 #include <exception>
 
 // These are some files that we need to include to use Ogre3D. Note that you can at the beginnings use directly "Ogre.h", to include lots of commonly used classes.
-#include "OGRE/OgreRoot.h"
-#include "OGRE/OgreRenderSystem.h"
-#include "OGRE/OgreRenderWindow.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
+#include "OgreRenderWindow.h"
+
+#include <RenderSystems/Direct3D9/OgreD3D9Plugin.h>
+#include <Plugins/OctreeSceneManager/OgreOctreePlugin.h>
 
 #include "EasyDefines.h"
 
@@ -43,7 +46,8 @@ namespace OgreEasy
 	SimpleOgreInit::SimpleOgreInit()
 		:mRoot(NULL), mWindow(NULL)
 	{
-
+		renderer = NULL;
+		sceneManager = NULL;
 	}
 
 	// the destructor frees memory allocated by the class. 
@@ -51,6 +55,14 @@ namespace OgreEasy
 	{
 		mWindow = NULL;
 		mRoot.reset();// I was not obliged to do that...
+
+		if(renderer != NULL)
+			mRoot->getSingleton().uninstallPlugin(renderer);
+		if(sceneManager != NULL)
+			mRoot->getSingleton().uninstallPlugin(sceneManager);
+
+		delete renderer;
+		delete sceneManager;
 	}
 
 
@@ -91,7 +103,7 @@ namespace OgreEasy
 				// Ogre uses Ogre::String (which is a typedef) to represent strings.
 				// Here I use a typedef. If you don't know what it means, you should learn C++ basics first.
 				// Same if you don't know what std::vector is.
-				typedef std::vector<Ogre::String> Strings;
+				//typedef std::vector<Ogre::String> Strings;
 				// Here I list all the plugins I want to load.
 				// I let those I don't want to use in comments.
 				// Opengl rendersystem is supposed to work everywhere.
@@ -100,31 +112,34 @@ namespace OgreEasy
 				// or too old directx version on windows (try update).
 				// Often, when one rendersystem fail, the other at least kind-a-work.
 				// I put them in a std::vector, because then I can factorise operations and calls (do a 'for').
-				Strings lPluginNames;
-				lPluginNames.push_back("RenderSystem_GL");
+				//Strings lPluginNames;
+				//lPluginNames.push_back("RenderSystem_GL");
 				//lPluginNames.push_back("RenderSystem_Direct3D9");
-				lPluginNames.push_back("Plugin_ParticleFX");
-				lPluginNames.push_back("Plugin_CgProgramManager");
+				//lPluginNames.push_back("Plugin_ParticleFX");
+				//lPluginNames.push_back("Plugin_CgProgramManager");
 				//lPluginNames.push_back("Plugin_PCZSceneManager");
 				//lPluginNames.push_back("Plugin_OctreeZone");
-				lPluginNames.push_back("Plugin_OctreeSceneManager");
+				//lPluginNames.push_back("Plugin_OctreeSceneManager");
 				//lPluginNames.push_back("Plugin_BSPSceneManager");
 
-				{
-					Strings::iterator lIter = lPluginNames.begin();
-					Strings::iterator lIterEnd = lPluginNames.end();
-					for(;lIter != lIterEnd; lIter++)
-					{
-						Ogre::String& lPluginName = (*lIter);
-						bool lIsInDebugMode = OGRE_DEBUG_MODE;
-						if(lIsInDebugMode)
-						{
-							lPluginName.append("_d");
-						}
-						mRoot->loadPlugin(lPluginName);
-					}
-				}
+				//{
+				//	Strings::iterator lIter = lPluginNames.begin();
+				//	Strings::iterator lIterEnd = lPluginNames.end();
+				//	for(;lIter != lIterEnd; lIter++)
+				//	{
+				//		Ogre::String& lPluginName = (*lIter);
+				//		bool lIsInDebugMode = OGRE_DEBUG_MODE;
+				//		if(lIsInDebugMode)
+				//		{
+				//			lPluginName.append("_d");
+				//		}
+				//		mRoot->loadPlugin(lPluginName);
+				//	}
+				//}
 			}
+
+			mRoot->getSingleton().installPlugin(renderer = new Ogre::D3D9Plugin());
+			mRoot->getSingleton().installPlugin(sceneManager = new Ogre::OctreePlugin());
 
 			// STEP 3/ Then, we can select from the loaded plugins the unique RenderSystem we want to use.
 			{
