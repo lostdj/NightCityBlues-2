@@ -16,7 +16,7 @@ out/win-x86/NightCityBlues2.exe
 
 ext/sdl/*
 ext/sdl-static-my/*
-ext/orge3d-src/*
+ext/ogre3d-src/*
 ext/ogre3d-static/*
 
 scr/*

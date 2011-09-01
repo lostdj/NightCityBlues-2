@@ -7,10 +7,19 @@
     <Filter Include="src">
       <UniqueIdentifier>{763569e9-5fa5-460a-8924-d64fe689f9bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ogreapp">
+      <UniqueIdentifier>{8bf7c8c2-89f2-49af-9f37-e81b5a4ea0bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Main.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogreapp\EasyDefines.cpp">
+      <Filter>src\ogreapp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogreapp\SimpleOgreInit.cpp">
+      <Filter>src\ogreapp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +31,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogreapp\EasyDefines.h">
+      <Filter>src\ogreapp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogreapp\SimpleOgreInit.h">
+      <Filter>src\ogreapp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogreapp\CImg.h">
+      <Filter>src\ogreapp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

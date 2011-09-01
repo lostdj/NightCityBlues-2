@@ -1,18 +1,29 @@
+//
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_mixer.h>
 #include <SDL_image.h>
 
+//
+#define OGRE_STATIC_LIB
+#include <OGRE/OgreRoot.h>
+#include <OGRE/OgreRenderWindow.h>
+#include <OGRE/OgreWindowEventUtilities.h>
+
+// Mad Marx Tutorials.
+#include "ogreapp/SimpleOgreInit.h"
+#include "ogreapp/EasyDefines.h"
+
+//
 #include "Base.h"
 #include "Config.h"
 
+//
 #include <signal.h>
-
 #if _d_os_win
-  #include <windows.h>
-  #include "resource.h"
+	#include <windows.h>
+	#include "resource.h"
 #endif
-
 #include <cmath>
 
 //
@@ -20,163 +31,163 @@
 //
 class Log
 {
-  public:
-    Log()
-    {
-      used = 0;
-    }
+	public:
+		Log()
+		{
+			used = 0;
+		}
 
-    ~Log()
-    {
-      printf("%s\n", buffer);
-    }
+		~Log()
+		{
+			printf("%s\n", buffer);
+		}
 
-    Log& operator <<(bool arg)
-    {
-      print(arg ? "true" : "false");
-      
-      return *this;
-    }
+		Log& operator <<(bool arg)
+		{
+			print(arg ? "true" : "false");
+			
+			return *this;
+		}
 
-    Log& operator <<(int8 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(int8 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(uint8 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(uint8 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(int16 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(int16 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(uint16 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(uint16 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(int32 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(int32 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(uint32 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(uint32 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(int64 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(int64 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(uint64 arg)
-    {
-      print("%d", arg);
+		Log& operator <<(uint64 arg)
+		{
+			print("%d", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(float64 arg)
-    {
-      print("%f", arg);
+		Log& operator <<(float64 arg)
+		{
+			print("%f", arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Log& operator <<(const char *arg)
-    {
-      print(arg);
+		Log& operator <<(const char *arg)
+		{
+			print(arg);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    void print(const char *fmt, ...)
-    {
-      va_list args;
-      va_start(args, fmt);
+		void print(const char *fmt, ...)
+		{
+			va_list args;
+			va_start(args, fmt);
 
-      #if _d_cc_msc && _d_cc_msc_major > 8
-        used += ::vsprintf_s(&buffer[used], _d_log_buffer_length - used, fmt, args);
-      #else
-        char b[_d_log_buffer_length];
-        int c = vsprintf(b, fmt, args);
+			#if _d_cc_msc && _d_cc_msc_major > 8
+				used += ::vsprintf_s(&buffer[used], _d_log_buffer_length - used, fmt, args);
+			#else
+				char b[_d_log_buffer_length];
+				int c = vsprintf(b, fmt, args);
 
-        if(c > _d_log_buffer_length - used)
-          b[c] = '\0';
+				if(c > _d_log_buffer_length - used)
+					b[c] = '\0';
 
-        used += sprintf(&buffer[used], b);
-      #endif
+				used += sprintf(&buffer[used], b);
+			#endif
 
-      va_end(args);
-    }
+			va_end(args);
+		}
 
-    const char* GetBuffer() const
-    {
-      return buffer;
-    }
+		const char* GetBuffer() const
+		{
+			return buffer;
+		}
 
-  private:
-    char buffer[_d_log_buffer_length];
-    int used;
+	private:
+		char buffer[_d_log_buffer_length];
+		int used;
 };
 
 #if _d_enable_log_info
-  #define _d_log_info(__args) \
-    { \
-      Log() << "Info: " << __args; \
-    }
+	#define _d_log_info(__args) \
+		{ \
+			Log() << "Info: " << __args; \
+		}
 #endif
 
 #if _d_enable_log_warn
-  #define _d_log_warn(__args) \
-    { \
-      Log() << "Warn: " << __args; \
-    }
+	#define _d_log_warn(__args) \
+		{ \
+			Log() << "Warn: " << __args; \
+		}
 #endif
 
 #if _d_enable_log_err
-  #define _d_log_err(__args) \
-    { \
-      Log() << "Err: " << __args; \
-    }
+	#define _d_log_err(__args) \
+		{ \
+			Log() << "Err: " << __args; \
+		}
 #endif
 
 #if _d_os_win
-  #define _d_log_fatal(__args) \
-    { \
-      Log l; \
-      l << "Fatal: " << __args; \
-      MessageBoxA( \
-        null, \
-        l.GetBuffer(), \
-        "Fatal", \
-        MB_ICONERROR | MB_OK | MB_DEFBUTTON1); \
-      ::exit(1); \
-    }
+	#define _d_log_fatal(__args) \
+		{ \
+			Log l; \
+			l << "Fatal: " << __args; \
+			MessageBoxA( \
+				null, \
+				l.GetBuffer(), \
+				"Fatal", \
+				MB_ICONERROR | MB_OK | MB_DEFBUTTON1); \
+			::exit(1); \
+		}
 #else
-  #define _d_log_fatal(__args) \
-    { \
-      Log() << "Fatal: " << __args; \
-      ::exit(1); \
-    }
+	#define _d_log_fatal(__args) \
+		{ \
+			Log() << "Fatal: " << __args; \
+			::exit(1); \
+		}
 #endif
 
 //
@@ -184,105 +195,105 @@ class Log
 //
 template<typename T> class Vector
 {
-  public:
-    T x;
-    T y;
+	public:
+		T x;
+		T y;
 
-    Vector()
-      : x(0), y(0)
-    {
-      ;
-    }
+		Vector()
+			: x(0), y(0)
+		{
+			;
+		}
 
-    Vector(T x, T y)
-      : x(x), y(y)
-    {
-      ;
-    }
+		Vector(T x, T y)
+			: x(x), y(y)
+		{
+			;
+		}
 
-    Vector(const Vector<T> &v)
-      : x(v.GetX()), y(v.GetY())
-    {
-      ;
-    }
+		Vector(const Vector<T> &v)
+			: x(v.GetX()), y(v.GetY())
+		{
+			;
+		}
 
-    T GetX() const
-    {
-      return x;
-    }
+		T GetX() const
+		{
+			return x;
+		}
 
-    T GetY() const
-    {
-      return y;
-    }
+		T GetY() const
+		{
+			return y;
+		}
 
-    Vector<T>& Set(T x, T y)
-    {
-      this->x = x;
-      this->y = y;
+		Vector<T>& Set(T x, T y)
+		{
+			this->x = x;
+			this->y = y;
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Vector<T>& Set(const Vector<T> &v)
-    {
-      x = v.GetX();
-      y = v.GetY();
+		Vector<T>& Set(const Vector<T> &v)
+		{
+			x = v.GetX();
+			y = v.GetY();
 
-      return *this;
-    }
+			return *this;
+		}
 
-    T GetDistance(const Vector<T> &to) const
-    {
-      return ::sqrt(GetDistanceSquared(to));
-    }
+		T GetDistance(const Vector<T> &to) const
+		{
+			return ::sqrt(GetDistanceSquared(to));
+		}
 
-    T GetDistanceSquared(const Vector<T> &to) const
-    {
-      T dx, dy;
-      dx = x - to.GetX();;
-      dy = y - to.GetY();
+		T GetDistanceSquared(const Vector<T> &to) const
+		{
+			T dx, dy;
+			dx = x - to.GetX();;
+			dy = y - to.GetY();
 
-      return (dx * dx) + (dy * dy);
-    }
+			return (dx * dx) + (dy * dy);
+		}
 
-    T GetLength() const
-    {
-      return ::sqrt(GetLengthSquared());
-    }
+		T GetLength() const
+		{
+			return ::sqrt(GetLengthSquared());
+		}
 
-    T GetLengthSquared() const
-    {
-      return (x * x) + (y * y);
-    }
+		T GetLengthSquared() const
+		{
+			return (x * x) + (y * y);
+		}
 
-    Vector<T>& Add(const Vector<T> &v)
-    {
-      Set(x + v.GetX(), y + v.GetY());
+		Vector<T>& Add(const Vector<T> &v)
+		{
+			Set(x + v.GetX(), y + v.GetY());
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Vector<T>& Sub(const Vector<T> &v)
-    {
-      Set(x - v.GetX(), y - v.GetY());
+		Vector<T>& Sub(const Vector<T> &v)
+		{
+			Set(x - v.GetX(), y - v.GetY());
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Vector<T>& Mul(const T to)
-    {
-      Set(x * to, y * to);
+		Vector<T>& Mul(const T to)
+		{
+			Set(x * to, y * to);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Vector<T>& Mul(const Vector<T> &v)
-    {
-      Set(x * v.GetX(), y * v.GetY());
+		Vector<T>& Mul(const Vector<T> &v)
+		{
+			Set(x * v.GetX(), y * v.GetY());
 
-      return *this;
-    }
+			return *this;
+		}
 };
 
 typedef Vector<GLdouble> Vector2d;
@@ -292,82 +303,82 @@ typedef Vector<GLdouble> Vector2d;
 //
 template<typename T> class Line
 {
-  public:
-    Vector<T> origin;
-    Vector<T> direction;
+	public:
+		Vector<T> origin;
+		Vector<T> direction;
 
-    static Line<T> Make(const Vector<T> &begin, const Vector<T> &end)
-    {
-      Vector<T> origin(begin);
-      Vector<T> direction(end);
-      direction.Sub(begin);
+		static Line<T> Make(const Vector<T> &begin, const Vector<T> &end)
+		{
+			Vector<T> origin(begin);
+			Vector<T> direction(end);
+			direction.Sub(begin);
 
-      return Line(origin, direction);
-    }
+			return Line(origin, direction);
+		}
 
-    Line()
-    {
-      ;
-    }
+		Line()
+		{
+			;
+		}
 
-    Line(const Vector<T> &origin, const Vector<T> &direction)
-    {
-      this->origin.Set(origin);
-      this->direction.Set(direction);
-    }
+		Line(const Vector<T> &origin, const Vector<T> &direction)
+		{
+			this->origin.Set(origin);
+			this->direction.Set(direction);
+		}
 
-    Line(const Line<T> &copy)
-    {
-      this->origin.Set(copy.GetOrigin());
-      this->direction.Set(copy.GetDirection());
-    }
+		Line(const Line<T> &copy)
+		{
+			this->origin.Set(copy.GetOrigin());
+			this->direction.Set(copy.GetDirection());
+		}
 
-    Vector<T> GetOrigin() const
-    {
-      return origin;
-    }
+		Vector<T> GetOrigin() const
+		{
+			return origin;
+		}
 
-    Vector<T> GetDirection() const
-    {
-      return direction;
-    }
+		Vector<T> GetDirection() const
+		{
+			return direction;
+		}
 
-    T GetLength() const
-    {
-      return direction.GetLength();
-    }
+		T GetLength() const
+		{
+			return direction.GetLength();
+		}
 
-    Line<T>& AddLength(T length)
-    {
-      if(length != 0)
-      {
-        length = T(1) + (length / GetLength());
-        direction.Set(direction.x * length, direction.y * length);
-      }
+		Line<T>& AddLength(T length)
+		{
+			if(length != 0)
+			{
+				length = T(1) + (length / GetLength());
+				direction.Set(direction.x * length, direction.y * length);
+			}
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Line<T>& SetLength(T length)
-    {
-      const T old = GetLength();
-      length = length - old;
-      if(length == 0)
-        return *this;
+		Line<T>& SetLength(T length)
+		{
+			const T old = GetLength();
+			length = length - old;
+			if(length == 0)
+				return *this;
 
-      length = T(1) + (length / old);
-      direction.Set(direction.x * length, direction.y * length);
+			length = T(1) + (length / old);
+			direction.Set(direction.x * length, direction.y * length);
 
-      return *this;
-    }
+			return *this;
+		}
 
-    Vector<T> GetAbsDirection()
-    {
-      Vector<T> v(origin);
-      v.Add(direction);
+		Vector<T> GetAbsDirection()
+		{
+			Vector<T> v(origin);
+			v.Add(direction);
 
-      return v;
-    }
+			return v;
+		}
 };
 
 typedef Line<GLdouble> Line2d;
@@ -377,17 +388,17 @@ typedef Line<GLdouble> Line2d;
 //
 class TimeMgr
 {
-  public:
-    typedef uint32 Time;
+	public:
+		typedef uint32 Time;
 
-    static Time GetTicks()
-    {
-      // "Initialization". Taking in account application loading time,
-      // as SDL_GetTicks() returns time since SDL init.
-      static Time t = SDL_GetTicks();
+		static Time GetTicks()
+		{
+			// "Initialization". Taking in account application loading time,
+			// as SDL_GetTicks() returns time since SDL init.
+			static Time t = SDL_GetTicks();
 
-      return SDL_GetTicks() - t;
-    }
+			return SDL_GetTicks() - t;
+		}
 };
 
 //
@@ -395,71 +406,71 @@ class TimeMgr
 //
 class Fade
 {
-  public:
-    const uint32 FADE_MILLIS;
-    const uint32 SLEEP_MILLIS;
+	public:
+		const uint32 FADE_MILLIS;
+		const uint32 SLEEP_MILLIS;
 
-    Fade()
-      : FADE_MILLIS(0), SLEEP_MILLIS(0)
-    {
-      ;
-    }
+		Fade()
+			: FADE_MILLIS(0), SLEEP_MILLIS(0)
+		{
+			;
+		}
 
-    Fade(uint32 fadeMillis, uint32 sleepMillis = 0, bool fadeIn = true)
-      : FADE_MILLIS(fadeMillis), SLEEP_MILLIS(sleepMillis),
-        fadeIn(true), fade(fadeIn ? 0 : 1), sleep(0)
-    {
-      ;
-    }
+		Fade(uint32 fadeMillis, uint32 sleepMillis = 0, bool fadeIn = true)
+			: FADE_MILLIS(fadeMillis), SLEEP_MILLIS(sleepMillis),
+				fadeIn(true), fade(fadeIn ? 0 : 1), sleep(0)
+		{
+			;
+		}
 
-    //Fade(uint32 fadeMillis, uint32 sleepMillis = 0, bool fadeIn = true, float64 fade = 0)
-    //  : FADE_MILLIS(fadeMillis), SLEEP_MILLIS(sleepMillis),
-    //    fadeIn(true), fade(fadeIn ? 0 : 1), sleep(0)
-    //{
-    //  ;
-    //}
+		//Fade(uint32 fadeMillis, uint32 sleepMillis = 0, bool fadeIn = true, float64 fade = 0)
+		//  : FADE_MILLIS(fadeMillis), SLEEP_MILLIS(sleepMillis),
+		//    fadeIn(true), fade(fadeIn ? 0 : 1), sleep(0)
+		//{
+		//  ;
+		//}
 
-    float64 Calc(uint32 prevTime, uint32 currentTime)
-    {
-      const uint32 elapsedTime = currentTime - prevTime;
+		float64 Calc(uint32 prevTime, uint32 currentTime)
+		{
+			const uint32 elapsedTime = currentTime - prevTime;
 
-      sleep += elapsedTime;
-      if(sleep >= SLEEP_MILLIS)
-      {
-        float64 fadeTick = (double)elapsedTime / (double)FADE_MILLIS;
-        if(fadeTick > FADE_MILLIS)
-        {
-          // TODO: !
-        }
+			sleep += elapsedTime;
+			if(sleep >= SLEEP_MILLIS)
+			{
+				float64 fadeTick = (double)elapsedTime / (double)FADE_MILLIS;
+				if(fadeTick > FADE_MILLIS)
+				{
+					// TODO: !
+				}
 
-        fade += fadeIn ? fadeTick : -fadeTick;
-        if(fade >= 1)
-        {
-          fadeIn = false;
+				fade += fadeIn ? fadeTick : -fadeTick;
+				if(fade >= 1)
+				{
+					fadeIn = false;
 
-          if(fade > 1)
-            fade += 1 - fade;
-        }
-        elif(fade <= 0)
-        {
-          fadeIn = true;
-          sleep = 0;
+					if(fade > 1)
+						fade += 1 - fade;
+				}
+				elif(fade <= 0)
+				{
+					fadeIn = true;
+					sleep = 0;
 
-          if(fade < 0)
-            fade = -fade;
-        }
+					if(fade < 0)
+						fade = -fade;
+				}
 
-        if(fade < 0 || fade > 1)
-          _d_log_fatal("Fade: " << fade);
+				if(fade < 0 || fade > 1)
+					_d_log_fatal("Fade: " << fade);
 
-        return fade;
-      }
-    }
+				return fade;
+			}
+		}
 
-  private:
-    bool fadeIn;
-    float64 fade;
-    uint32 sleep;
+	private:
+		bool fadeIn;
+		float64 fade;
+		uint32 sleep;
 };
 
 //
@@ -467,37 +478,85 @@ class Fade
 //
 void SignalHandlerFpe(int s)
 {
-  _d_log_fatal("Caught " << _d_funcname);
+	_d_log_fatal("Caught " << _d_funcname);
 }
 
 void SignalHandlerIll(int s)
 {
-  _d_log_fatal("Caught " << _d_funcname);
+	_d_log_fatal("Caught " << _d_funcname);
 }
 
 void SignalHandlerSeg(int s)
 {
-  _d_log_fatal("Caught " << _d_funcname);
+	_d_log_fatal("Caught " << _d_funcname);
+}
+
+// I declare a function in which I will make my whole application.
+// This is easy then to add more things later in that function.
+// The main will call this function and take care of the global try/catch.
+void AnOgreApplication()
+{
+
+	return;
+}
+
+
+int main()
+{
+	try
+	{
+		AnOgreApplication();
+		std::cout<<"end of the program"<<std::endl;
+	}
+	catch(Ogre::Exception &e)
+	{
+		MWARNING("!!!!Ogre::Exception!!!!\n" << e.what());
+	}
+	catch(std::exception &e)
+	{
+		MWARNING("!!!!std::exception!!!!\n"<<e.what());
+	}
+	OgreEasy::waitForUser();
+	return 0;
 }
 
 int main(int argc, char **argv)
 {
-  //
-  signal(SIGFPE, SignalHandlerFpe);
-  signal(SIGILL, SignalHandlerIll);
-  signal(SIGSEGV, SignalHandlerSeg);
+	//
+	signal(SIGFPE, SignalHandlerFpe);
+	signal(SIGILL, SignalHandlerIll);
+	signal(SIGSEGV, SignalHandlerSeg);
 
-  // Defaults.
-  uint32 screenWidth = _d_app_default_screen_width;
-  uint32 screenHeight = _d_app_default_screen_height;
-  uint32 soundVolume = _d_app_default_sound_volume;
-  char *windowCaption = _d_app_window_caption;
+	// Defaults.
+	uint32 screenWidth = _d_app_default_screen_width;
+	uint32 screenHeight = _d_app_default_screen_height;
+	uint32 soundVolume = _d_app_default_sound_volume;
+	char *windowCaption = _d_app_window_caption;
 
-  //
-  //App app(screenWidth, screenHeight, soundVolume, windowCaption);
-  //app.Init();
-  //app.Run();
-  //app.Destroy();
+	//
+	//App app(screenWidth, screenHeight, soundVolume, windowCaption);
+	//app.Init();
+	//app.Run();
+	//app.Destroy();
 
-  return 0;
+	// I construct my object that will allow me to initialise Ogre easily.
+	OgreEasy::SimpleOgreInit lOgreInit;
+
+	if(!lOgreInit.initOgre())
+	{
+		_d_log_fatal("Impossible to init Ogre correctly.");
+		return 1;
+	}
+
+	// I wait until the window is closed.
+	// The "message pump" thing is something you will see in most GUI application.
+	// It allow the binding of messages between the application and the OS.
+	// These messages are most of the time : keystroke, mouse moved, ... or window closed.
+	// If I don't do this, the message are never caught, and the window won't close.
+	while(!lOgreInit.mWindow->isClosed())
+	{
+		Ogre::WindowEventUtilities::messagePump();
+	}
+
+	return 0;
 }
