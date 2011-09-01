@@ -38,7 +38,11 @@
 #include <RenderSystems/Direct3D9/OgreD3D9Plugin.h>
 #include <Plugins/OctreeSceneManager/OgreOctreePlugin.h>
 
+#include "OgreConfigDialogImp.h"
+
 #include "EasyDefines.h"
+
+#include "../Config.h"
 
 namespace OgreEasy
 {
@@ -68,6 +72,13 @@ namespace OgreEasy
 
 	bool SimpleOgreInit::initOgre()
 	{
+		Ogre::String lLogFileName = "";
+		if(!Ogre::LogManager::getSingletonPtr())
+		{
+			Ogre::LogManager *mLogManager = new Ogre::LogManager();
+			mLogManager->createLog(lLogFileName, true, true, true);
+		}
+
 		bool result = false;
 		// This try/catch will catch potential exception launched by ogre or by my program.
 		// Ogre can launch 'Ogre::Exception' for example.
@@ -79,19 +90,34 @@ namespace OgreEasy
 			// This is the name of an optionnal textual configuration file for the rendersystem.
 			// I won't use it.
 			Ogre::String lConfigFileName = "";
-			// This is the name of an optionnal textual configuration file, which lists the available plugins.
-			// I won't use it.
-			Ogre::String lPluginsFileName = "";
-			// This is the name of the log file. A log file is a file in which you can write things during the program execution.
-			// Ogre use it to display general informations about the rendersystem.
-			// You are not obliged to generate one, and ogre can even transmit the log data to you own class if you want.
-			// Here we only ask the root to create the file.
-			Ogre::String lLogFileName = "Ogre.log";
+#if _d_os_win
+	DWORD dwRetVal;
+	DWORD dwBufSize=4096;    // length of the buffer
+	char lpPathBuffer[4096]; // buffer for path
+
+	// Get the temp path.
+	dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
+
+	if (dwRetVal > dwBufSize)
+	{
+		std::stringstream ss;
+		ss << "GetTempPath failed with error: " << GetLastError() << "\n";
+		Ogre::LogManager::getSingleton().logMessage(ss.str());
+	}
+	else
+	{
+		std::stringstream ss;
+		ss << "GetTempPath returned: " << lpPathBuffer << "\n";
+		Ogre::LogManager::getSingleton().logMessage(ss.str());
+		lConfigFileName.append(lpPathBuffer);
+		lConfigFileName.append("\\NightCityBlues.cfg");
+	}
+#endif
 
 			// I create the root and I wrap it in an auto_ptr so that it will be automatically released.
 			// Now I can even do "throw std::bad_alloc("bad alloc");", the program will release the root smoothly.
 			mRoot = std::auto_ptr<Ogre::Root>(
-				new Ogre::Root(lConfigFileName, lPluginsFileName, lLogFileName));
+				new Ogre::Root("", lConfigFileName, lLogFileName));
 
 			// STEP 2/ Then we need to load plugins. It means that there are functions that are stored inside dynamic libraries.
 			// These libraries are .dll or .so files. Most projects Ogre Project do not need all functions to be usable.
@@ -158,12 +184,18 @@ namespace OgreEasy
 				mRoot->setRenderSystem(lRenderSystem);
 			}
 
+			mRoot->restoreConfig();
+			Ogre::ConfigDialog dlg;
+			bool ok = dlg.display();
+			if(ok)
+				mRoot->saveConfig();
+
 			// STEP 4/ When the RenderSystem is selected, we can initialise the Root. The root can be initialised only when a rendersystem has been selected.
 			{
 				// I can create a window automatically, but I won't do it.
 				bool lCreateAWindowAutomatically = false;
 				// name of the automatically generated window. empty for me.
-				Ogre::String lWindowTitle = "";
+				Ogre::String lWindowTitle = "asd";
 				// custom capabilities of the rendersystem. It's a feature for advanced use.
 				Ogre::String lCustomCapacities = "";
 				mRoot->initialise(lCreateAWindowAutomatically, lWindowTitle, lCustomCapacities);
@@ -171,22 +203,35 @@ namespace OgreEasy
 
 			// STEP 5/ Then we can ask to the RenderSystem to create a window.
 			{
-				Ogre::String lWindowTitle = "Hello Ogre World";
-				unsigned int lSizeX = 800;
-				unsigned int lSizeY = 600;
+				//Ogre::String lWindowTitle = "Hello Ogre World";
+				unsigned int width = 800;
+				unsigned int height = 600;
+
+				Ogre::ConfigOptionMap mOptions = mRoot->getRenderSystem()->getConfigOptions();
+				Ogre::ConfigOptionMap::iterator opt = mOptions.find( "Video Mode" );
+				if( opt == mOptions.end() )
+					OGRE_EXCEPT( Ogre::Exception::ERR_INTERNAL_ERROR, "Can't find Video Mode option!", "D3D9RenderSystem::initialise" );
+				// Now we know that the width starts a 0, so if we can find the end we can parse that out
+				Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ');
+				// we know that the height starts 3 characters after the width and goes until the next space
+				Ogre::String::size_type heightEnd = opt->second.currentValue.find(' ', widthEnd+3);
+				// Now we can parse out the values
+				width = Ogre::StringConverter::parseInt(opt->second.currentValue.substr(0, widthEnd));
+				height = Ogre::StringConverter::parseInt(opt->second.currentValue.substr(widthEnd+3, heightEnd));
+
 				//I don't want to use fullscreen during development.
 				bool lFullscreen = false; 
 				// This is just an example of parameters that we can put. Check the API for more details.
 				Ogre::NameValuePairList lParams;
 				// fullscreen antialiasing. (check wikipedia if needed).
-				lParams["FSAA"] = "0"; 
+				//lParams["FSAA"] = "0"; 
 				// vertical synchronisation will prevent some image-tearing, but also
 				// will provide smooth framerate in windowed mode.(check wikipedia if needed).
-				lParams["vsync"] = "true";
-				mWindow = mRoot->createRenderWindow(lWindowTitle, lSizeX, lSizeY, lFullscreen, &lParams);
+				//lParams["vsync"] = "true";
+				mWindow = mRoot->createRenderWindow("", width, height, lFullscreen, &lParams);
 			}
-			result = true;
 
+			result = true;
 		}
 		catch(Ogre::Exception &e)
 		{

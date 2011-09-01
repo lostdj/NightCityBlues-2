@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\src\ogreapp\SimpleOgreInit.cpp">
       <Filter>src\ogreapp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ogreapp\OgreConfigDialog.cpp">
+      <Filter>src\ogreapp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Base.h">
@@ -39,6 +42,9 @@
       <Filter>src\ogreapp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ogreapp\CImg.h">
+      <Filter>src\ogreapp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogreapp\OgreConfigDialogImp.h">
       <Filter>src\ogreapp</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,5 +78,13 @@
     <None Include="..\..\out\np.png">
       <Filter>res</Filter>
     </None>
+    <None Include="..\..\..\night.city.blues\out\nc.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane.png" />
+    <None Include="..\..\..\night.city.blues\out\blues.mp3" />
+    <None Include="..\..\..\night.city.blues\out\nc-lights1.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-red.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-green.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-white.png" />
+    <None Include="..\..\..\night.city.blues\out\np.png" />
   </ItemGroup>
 </Project>

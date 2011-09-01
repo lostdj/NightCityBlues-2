@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\Main.cpp" />
     <ClCompile Include="..\..\src\ogreapp\EasyDefines.cpp" />
+    <ClCompile Include="..\..\src\ogreapp\OgreConfigDialog.cpp" />
     <ClCompile Include="..\..\src\ogreapp\SimpleOgreInit.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +108,7 @@
     <ClInclude Include="..\..\src\Config.h" />
     <ClInclude Include="..\..\src\ogreapp\CImg.h" />
     <ClInclude Include="..\..\src\ogreapp\EasyDefines.h" />
+    <ClInclude Include="..\..\src\ogreapp\OgreConfigDialogImp.h" />
     <ClInclude Include="..\..\src\ogreapp\SimpleOgreInit.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -114,6 +116,14 @@
     <ResourceCompile Include="NightCityBlues.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-green.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-red.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane-lights-white.png" />
+    <None Include="..\..\..\night.city.blues\out\airplane.png" />
+    <None Include="..\..\..\night.city.blues\out\blues.mp3" />
+    <None Include="..\..\..\night.city.blues\out\nc-lights1.png" />
+    <None Include="..\..\..\night.city.blues\out\nc.png" />
+    <None Include="..\..\..\night.city.blues\out\np.png" />
     <None Include="..\..\out\airplane-lights-green.png" />
     <None Include="..\..\out\airplane-lights-red.png" />
     <None Include="..\..\out\airplane-lights-white.png" />
