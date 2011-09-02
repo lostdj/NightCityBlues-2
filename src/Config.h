@@ -16,10 +16,10 @@
 #define _d_log_buffer_length 1024
 
 //
-#define _d_app_default_screen_width 800
-#define _d_app_default_screen_height 600
+#define _d_app_log_file_name ""//"NightCityBlues2.log"
+#define _d_app_cfg_file_name "NightCityBlues2.cfg"
 #define _d_app_default_sound_volume 64
-#define _d_app_window_caption "Night City Blues"
+#define _d_app_window_caption "Night City Blues 2"
 #if _d_os_win
   // Refer to resource.h
   #define _d_app_res_np IDB_PNG7

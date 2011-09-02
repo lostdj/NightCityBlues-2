@@ -27,97 +27,87 @@
 // ------------------------------------------------------------------------------//
 #include "SimpleOgreInit.h"
 
-// I will check for std::exception. If you don't know what exception/try/catch means, you should learn C++ first.
 #include <exception>
 
-// These are some files that we need to include to use Ogre3D. Note that you can at the beginnings use directly "Ogre.h", to include lots of commonly used classes.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderWindow.h"
 
 #include <RenderSystems/Direct3D9/OgreD3D9Plugin.h>
-#include <Plugins/OctreeSceneManager/OgreOctreePlugin.h>
+#include <OgreCamera.h>
+#include <OgreViewport.h>
+#include <OgreSceneManager.h>
+//#include <Plugins/OctreeSceneManager/OgreOctreePlugin.h>
 
 #include "OgreConfigDialogImp.h"
 
 #include "EasyDefines.h"
 
-#include "../Config.h"
+#include "../Base.h"
 
 namespace OgreEasy
 {
-	// the constructor uses the initialisation list to have a proper state.
-	SimpleOgreInit::SimpleOgreInit()
-		:mRoot(NULL), mWindow(NULL)
+	SimpleOgreInit::SimpleOgreInit(Ogre::String logFileName, Ogre::String cfgFileName, Ogre::String windowCaption)
+		: mRoot(NULL), mWindow(NULL)
 	{
+		this->logFileName = logFileName;
+		this->cfgFileName = cfgFileName;
+		this->windowCaption = windowCaption;
+
 		renderer = NULL;
 		sceneManager = NULL;
+
+		if(!Ogre::LogManager::getSingletonPtr())
+		{
+			// TODO: Tmp user dir.
+			Ogre::LogManager *mLogManager = new Ogre::LogManager();
+			mLogManager->createLog(logFileName, true, true, true);
+		}
 	}
 
-	// the destructor frees memory allocated by the class. 
 	SimpleOgreInit::~SimpleOgreInit()
 	{
 		mWindow = NULL;
-		mRoot.reset();// I was not obliged to do that...
-
-		//if(renderer != NULL)
-		//	mRoot->getSingleton().uninstallPlugin(renderer);
-		//if(sceneManager != NULL)
-		//	mRoot->getSingleton().uninstallPlugin(sceneManager);
-
-		//delete renderer;
-		//delete sceneManager;
+		mRoot.reset();
 	}
-
 
 	bool SimpleOgreInit::initOgre()
 	{
-		Ogre::String lLogFileName = "";
-		if(!Ogre::LogManager::getSingletonPtr())
-		{
-			Ogre::LogManager *mLogManager = new Ogre::LogManager();
-			mLogManager->createLog(lLogFileName, true, true, true);
-		}
-
 		bool result = false;
-		// This try/catch will catch potential exception launched by ogre or by my program.
-		// Ogre can launch 'Ogre::Exception' for example.
+
 		try
 		{
-			// STEP 1/ First, we will need to create the Ogre::Root object.
-			// It is an object that must be created to use ogre correctly, and delete once we are finished using Ogre.
-
-			// This is the name of an optionnal textual configuration file for the rendersystem.
-			// I won't use it.
+			//
 			Ogre::String lConfigFileName = "";
-#if _d_os_win
-	DWORD dwRetVal;
-	DWORD dwBufSize=4096;    // length of the buffer
-	char lpPathBuffer[4096]; // buffer for path
+			#if _d_os_win
+				DWORD dwRetVal;
+				DWORD dwBufSize=4096;    // length of the buffer
+				char lpPathBuffer[4096]; // buffer for path
 
-	// Get the temp path.
-	dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
+				// Get the temp path.
+				dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
-	if (dwRetVal > dwBufSize)
-	{
-		std::stringstream ss;
-		ss << "GetTempPath failed with error: " << GetLastError() << "\n";
-		Ogre::LogManager::getSingleton().logMessage(ss.str());
-	}
-	else
-	{
-		std::stringstream ss;
-		ss << "GetTempPath returned: " << lpPathBuffer << "\n";
-		Ogre::LogManager::getSingleton().logMessage(ss.str());
-		lConfigFileName.append(lpPathBuffer);
-		lConfigFileName.append("\\NightCityBlues.cfg");
-	}
-#endif
+				if(dwRetVal > dwBufSize)
+				{
+					std::stringstream ss;
+					ss << "GetTempPath failed with an error: " << GetLastError() << "\n";
+					Ogre::LogManager::getSingleton().logMessage(ss.str());
+				}
+				else
+				{
+					std::stringstream ss;
+					ss << "GetTempPath returned: " << lpPathBuffer << "\n";
+					Ogre::LogManager::getSingleton().logMessage(ss.str());
+					lConfigFileName.append(lpPathBuffer);
+					lConfigFileName.append("\\");
+					lConfigFileName.append(cfgFileName);
+				}
+			#endif
 
 			// I create the root and I wrap it in an auto_ptr so that it will be automatically released.
 			// Now I can even do "throw std::bad_alloc("bad alloc");", the program will release the root smoothly.
 			mRoot = std::auto_ptr<Ogre::Root>(
-				new Ogre::Root("", lConfigFileName, lLogFileName));
+				new Ogre::Root("", lConfigFileName, logFileName));
 
 			// STEP 2/ Then we need to load plugins. It means that there are functions that are stored inside dynamic libraries.
 			// These libraries are .dll or .so files. Most projects Ogre Project do not need all functions to be usable.
@@ -165,7 +155,7 @@ namespace OgreEasy
 			}
 
 			mRoot->getSingleton().installPlugin(renderer = new Ogre::D3D9Plugin());
-			mRoot->getSingleton().installPlugin(sceneManager = new Ogre::OctreePlugin());
+			//mRoot->getSingleton().installPlugin(sceneManager = new Ogre::OctreePlugin());
 
 			// STEP 3/ Then, we can select from the loaded plugins the unique RenderSystem we want to use.
 			{
@@ -192,21 +182,19 @@ namespace OgreEasy
 
 			// STEP 4/ When the RenderSystem is selected, we can initialise the Root. The root can be initialised only when a rendersystem has been selected.
 			{
-				// I can create a window automatically, but I won't do it.
 				bool lCreateAWindowAutomatically = false;
-				// name of the automatically generated window. empty for me.
-				Ogre::String lWindowTitle = "asd";
-				// custom capabilities of the rendersystem. It's a feature for advanced use.
 				Ogre::String lCustomCapacities = "";
-				mRoot->initialise(lCreateAWindowAutomatically, lWindowTitle, lCustomCapacities);
+				mRoot->initialise(lCreateAWindowAutomatically, windowCaption, lCustomCapacities);
 			}
 
 			// STEP 5/ Then we can ask to the RenderSystem to create a window.
 			{
-				//Ogre::String lWindowTitle = "Hello Ogre World";
+				//
 				unsigned int width = 800;
 				unsigned int height = 600;
+				bool lFullscreen = false;
 
+				//
 				Ogre::ConfigOptionMap mOptions = mRoot->getRenderSystem()->getConfigOptions();
 				Ogre::ConfigOptionMap::iterator opt = mOptions.find( "Video Mode" );
 				if( opt == mOptions.end() )
@@ -219,8 +207,6 @@ namespace OgreEasy
 				width = Ogre::StringConverter::parseInt(opt->second.currentValue.substr(0, widthEnd));
 				height = Ogre::StringConverter::parseInt(opt->second.currentValue.substr(widthEnd+3, heightEnd));
 
-				//I don't want to use fullscreen during development.
-				bool lFullscreen = false; 
 				// This is just an example of parameters that we can put. Check the API for more details.
 				Ogre::NameValuePairList lParams;
 				// fullscreen antialiasing. (check wikipedia if needed).
@@ -228,7 +214,7 @@ namespace OgreEasy
 				// vertical synchronisation will prevent some image-tearing, but also
 				// will provide smooth framerate in windowed mode.(check wikipedia if needed).
 				//lParams["vsync"] = "true";
-				mWindow = mRoot->createRenderWindow("", width, height, lFullscreen, &lParams);
+				mWindow = mRoot->createRenderWindow(windowCaption, width, height, lFullscreen, &lParams);
 			}
 
 			result = true;

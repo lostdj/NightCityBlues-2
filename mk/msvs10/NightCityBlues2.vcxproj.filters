@@ -10,6 +10,12 @@
     <Filter Include="src\ogreapp">
       <UniqueIdentifier>{8bf7c8c2-89f2-49af-9f37-e81b5a4ea0bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ogremax">
+      <UniqueIdentifier>{a5ac59b8-1aff-420e-975e-2933e86aa35d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\tinyxml">
+      <UniqueIdentifier>{b88c0a48-c97a-4d85-8bd9-71ea8143e288}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Main.cpp">
@@ -23,6 +29,30 @@
     </ClCompile>
     <ClCompile Include="..\..\src\ogreapp\OgreConfigDialog.cpp">
       <Filter>src\ogreapp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxml.cpp">
+      <Filter>src\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxmlerror.cpp">
+      <Filter>src\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxmlparser.cpp">
+      <Filter>src\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxModel.cpp">
+      <Filter>src\ogremax</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxScene.cpp">
+      <Filter>src\ogremax</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxUtilities.cpp">
+      <Filter>src\ogremax</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\ProgressCalculator.cpp">
+      <Filter>src\ogremax</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\Version.cpp">
+      <Filter>src\ogremax</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +76,33 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ogreapp\OgreConfigDialogImp.h">
       <Filter>src\ogreapp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxml.h">
+      <Filter>src\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxModel.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxPlatform.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxRenderWindowIterator.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxScene.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxTypes.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxUtilities.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\ProgressCalculator.hpp">
+      <Filter>src\ogremax</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\Version.hpp">
+      <Filter>src\ogremax</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

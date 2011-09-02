@@ -11,8 +11,11 @@
 #include <OgreWindowEventUtilities.h>
 
 // Mad Marx Tutorials.
-#include "ogreapp/SimpleOgreInit.h"
 #include "ogreapp/EasyDefines.h"
+#include "ogreapp/SimpleOgreInit.h"
+
+#include "OgreMaxScene.hpp"
+using namespace OgreMax;
 
 //
 #include "Base.h"
@@ -39,7 +42,8 @@ class Log
 
 		~Log()
 		{
-			printf("%s\n", buffer);
+			//printf("%s\n", buffer);
+			Ogre::LogManager::getSingleton().logMessage(buffer);
 		}
 
 		Log& operator <<(bool arg)
@@ -476,6 +480,73 @@ class Fade
 //
 //
 //
+class App : public OgreEasy::SimpleOgreInit
+{
+	public:
+		App(Ogre::String logFileName, Ogre::String cfgFileName, Ogre::String windowCaption)
+			: SimpleOgreInit(logFileName, cfgFileName, windowCaption)
+		{
+			;
+		};
+
+		bool Init()
+		{
+			try
+			{
+				//
+				if(!initOgre())
+				{
+					_d_log_fatal("Impossible to init Ogre correctly.");
+					return false;
+				}
+
+				//
+				OgreMaxScene *scene = new OgreMaxScene();
+				scene->Load("scene.scene", mWindow, OgreMaxScene::NO_OPTIONS);
+
+				//
+				/*Ogre::SceneManager *mgr = scene->GetSceneManager();
+				Ogre::Camera *cam = mgr->getCamera("Camera001");
+				Ogre::Viewport *vp = mRoot->getAutoCreatedWindow()->addViewport(cam);*/
+			}
+			catch(Ogre::Exception &e)
+			{
+				_d_log_fatal("Ogre::Exception:\r\n" << e.what());
+			}
+			catch(std::exception &e)
+			{
+				_d_log_fatal("std::exception:\r\n" << e.what());
+			}
+
+			return true;
+		}
+
+		void Run()
+		{
+			//
+			try
+			{
+				//
+				;
+
+				//
+				while(!mWindow->isClosed())
+					Ogre::WindowEventUtilities::messagePump();
+			}
+			catch(Ogre::Exception &e)
+			{
+				_d_log_fatal("Ogre::Exception:\r\n" << e.what());
+			}
+			catch(std::exception &e)
+			{
+				_d_log_fatal("std::exception:\r\n" << e.what());
+			}
+		}
+};
+
+//
+//
+//
 void SignalHandlerFpe(int s)
 {
 	_d_log_fatal("Caught " << _d_funcname);
@@ -491,35 +562,6 @@ void SignalHandlerSeg(int s)
 	_d_log_fatal("Caught " << _d_funcname);
 }
 
-// I declare a function in which I will make my whole application.
-// This is easy then to add more things later in that function.
-// The main will call this function and take care of the global try/catch.
-void AnOgreApplication()
-{
-
-	return;
-}
-
-
-int main()
-{
-	try
-	{
-		AnOgreApplication();
-		std::cout<<"end of the program"<<std::endl;
-	}
-	catch(Ogre::Exception &e)
-	{
-		MWARNING("!!!!Ogre::Exception!!!!\n" << e.what());
-	}
-	catch(std::exception &e)
-	{
-		MWARNING("!!!!std::exception!!!!\n"<<e.what());
-	}
-	OgreEasy::waitForUser();
-	return 0;
-}
-
 int main(int argc, char **argv)
 {
 	//
@@ -527,36 +569,13 @@ int main(int argc, char **argv)
 	signal(SIGILL, SignalHandlerIll);
 	signal(SIGSEGV, SignalHandlerSeg);
 
-	// Defaults.
-	uint32 screenWidth = _d_app_default_screen_width;
-	uint32 screenHeight = _d_app_default_screen_height;
-	uint32 soundVolume = _d_app_default_sound_volume;
-	char *windowCaption = _d_app_window_caption;
-
 	//
-	//App app(screenWidth, screenHeight, soundVolume, windowCaption);
-	//app.Init();
-	//app.Run();
+	App app(_d_app_log_file_name, _d_app_cfg_file_name, _d_app_window_caption);
+	app.Init();
+	app.Run();
 	//app.Destroy();
 
-	// I construct my object that will allow me to initialise Ogre easily.
-	OgreEasy::SimpleOgreInit lOgreInit;
-
-	if(!lOgreInit.initOgre())
-	{
-		_d_log_fatal("Impossible to init Ogre correctly.");
-		return 1;
-	}
-
-	// I wait until the window is closed.
-	// The "message pump" thing is something you will see in most GUI application.
-	// It allow the binding of messages between the application and the OS.
-	// These messages are most of the time : keystroke, mouse moved, ... or window closed.
-	// If I don't do this, the message are never caught, and the window won't close.
-	while(!lOgreInit.mWindow->isClosed())
-	{
-		Ogre::WindowEventUtilities::messagePump();
-	}
+	OgreEasy::waitForUser();
 
 	return 0;
 }

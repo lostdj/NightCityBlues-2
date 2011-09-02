@@ -73,8 +73,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>./;../../ext/sdl-static/include/;../../ext/sdl-static/include/SDL12;../../ext/ogre3d-static/sdk/include/OGRE;D:\dev\i\dxsdk\2010.06\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./;../../ext/sdl-static/include/;../../ext/sdl-static/include/SDL12;../../ext/ogre3d-static/sdk/include/OGRE;D:\dev\i\dxsdk\2010.06\Include;../../ext/ogremax/src</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
@@ -98,12 +98,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxModel.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxScene.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxUtilities.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\ProgressCalculator.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\Version.cpp" />
     <ClCompile Include="..\..\src\Main.cpp" />
     <ClCompile Include="..\..\src\ogreapp\EasyDefines.cpp" />
     <ClCompile Include="..\..\src\ogreapp\OgreConfigDialog.cpp" />
     <ClCompile Include="..\..\src\ogreapp\SimpleOgreInit.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxModel.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxPlatform.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxRenderWindowIterator.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxScene.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxTypes.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\OgreMaxUtilities.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\ProgressCalculator.hpp" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\tinyxml\tinyxml.h" />
+    <ClInclude Include="..\..\ext\ogremax\OgreMaxViewers\Common\Code\Version.hpp" />
     <ClInclude Include="..\..\src\Base.h" />
     <ClInclude Include="..\..\src\Config.h" />
     <ClInclude Include="..\..\src\ogreapp\CImg.h" />

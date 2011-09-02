@@ -14,9 +14,9 @@ mk/msvs10/Debug/*
 
 out/win-x86/NightCityBlues2.exe
 
-ext/sdl/*
-ext/sdl-static-my/*
 ext/ogre3d-src/*
 ext/ogre3d-static/*
+ext/ogremax/3DSMax/*
+ext/ogremax/OgreMaxViewers/*
 
 scr/*
