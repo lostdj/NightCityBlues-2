@@ -13,6 +13,10 @@ mk/msvs10/Release/*
 mk/msvs10/Debug/*
 
 out/win-x86/NightCityBlues2.exe
+out/win-x86/*.mesh
+out/win-x86/*.scene
+out/win-x86/*.material
+out/win-x86/windows.jpg
 
 ext/ogre3d-src/*
 ext/ogre3d-static/*

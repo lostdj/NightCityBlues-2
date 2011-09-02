@@ -9,6 +9,7 @@
 #include <OgreRoot.h>
 #include <OgreRenderWindow.h>
 #include <OgreWindowEventUtilities.h>
+#include <OgreMaterialManager.h>
 
 // Mad Marx Tutorials.
 #include "ogreapp/EasyDefines.h"
@@ -486,7 +487,7 @@ class App : public OgreEasy::SimpleOgreInit
 		App(Ogre::String logFileName, Ogre::String cfgFileName, Ogre::String windowCaption)
 			: SimpleOgreInit(logFileName, cfgFileName, windowCaption)
 		{
-			;
+			scene = null;
 		};
 
 		bool Init()
@@ -501,13 +502,44 @@ class App : public OgreEasy::SimpleOgreInit
 				}
 
 				//
-				OgreMaxScene *scene = new OgreMaxScene();
+				if(SDL_Init(SDL_INIT_AUDIO) < 0)
+					_d_log_fatal("Failed to initialize SDL: " << SDL_GetError());
+
+				//
+				if(Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 4096) < 0)
+					_d_log_fatal("Failed to initialize audio: " << SDL_GetError());
+
+				//
+				SDL_RWops *rw = LoadResource(_d_app_res_blues);
+				if(!rw)
+					_d_log_fatal(_d_file_line << ": " << SDL_GetError());
+				//blues = Mix_LoadMUS("blues.mp3");
+				blues = Mix_LoadMUS_RW(rw);
+				if(!blues)
+					_d_log_fatal(_d_file_line << ": " << SDL_GetError());
+				//SDL_FreeRW(rw); // Commented out. Required by streamer.
+
+				//
+				atexit(SDL_Quit);
+
+				//
+				Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(1);
+				Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_NONE);
+				//Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MIN, Ogre::FO_NONE);
+				//Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MAG, Ogre::FO_NONE);
+
+				//
+				scene = new OgreMaxScene();
 				scene->Load("scene.scene", mWindow, OgreMaxScene::NO_OPTIONS);
 
 				//
-				/*Ogre::SceneManager *mgr = scene->GetSceneManager();
+				Ogre::SceneManager *mgr = scene->GetSceneManager();
 				Ogre::Camera *cam = mgr->getCamera("Camera001");
-				Ogre::Viewport *vp = mRoot->getAutoCreatedWindow()->addViewport(cam);*/
+				Ogre::Viewport *vp = mWindow->addViewport(cam);
+				vp->setAutoUpdated(true);
+				mWindow->setActive(true);
+				mWindow->setAutoUpdated(false);
+				mRoot->clearEventTimes();
 			}
 			catch(Ogre::Exception &e)
 			{
@@ -527,11 +559,21 @@ class App : public OgreEasy::SimpleOgreInit
 			try
 			{
 				//
+				if(Mix_PlayMusic(blues, -1) == -1)
+					_d_log_fatal("Mix_PlayMusic(): " << SDL_GetError());
+
+				//
 				;
 
 				//
 				while(!mWindow->isClosed())
+				{
+					mWindow->update(false);
+					mWindow->swapBuffers(true);
+					mRoot->renderOneFrame();
+
 					Ogre::WindowEventUtilities::messagePump();
+				}
 			}
 			catch(Ogre::Exception &e)
 			{
@@ -542,6 +584,43 @@ class App : public OgreEasy::SimpleOgreInit
 				_d_log_fatal("std::exception:\r\n" << e.what());
 			}
 		}
+
+		void Destroy()
+		{
+			mWindow->removeAllViewports();
+
+			scene->Destroy();
+			scene->GetRootNode()->removeAndDestroyAllChildren();
+
+			//Ogre::ResourceGroupManager::getSingleton().destroyResourceGroup(lNameOfResourceGroup);
+		}
+
+		#if _d_os_win
+			SDL_RWops* LoadResource(int resourceId)
+			{
+				HRSRC resRef = FindResourceA(null, MAKEINTRESOURCEA(resourceId), "FOO");
+				if(!resRef)
+					_d_log_fatal(_d_file_line << ", resourceId: " << resourceId);
+
+				HGLOBAL resPtr = ::LoadResource(null, resRef);
+				if(!resPtr)
+					_d_log_fatal(_d_file_line << ", resourceId: " << resourceId);
+
+				void *resData = LockResource(resPtr);
+				if(!resData)
+					_d_log_fatal(_d_file_line << ", resourceId: " << resourceId);
+
+				SDL_RWops *rw = SDL_RWFromMem(resData, SizeofResource(null, resRef));
+
+				UnlockResource(resRef);
+
+				return rw;
+			}
+		#endif
+
+		Mix_Music *blues;
+
+		OgreMaxScene *scene;
 };
 
 //
@@ -573,7 +652,7 @@ int main(int argc, char **argv)
 	App app(_d_app_log_file_name, _d_app_cfg_file_name, _d_app_window_caption);
 	app.Init();
 	app.Run();
-	//app.Destroy();
+	app.Destroy();
 
 	OgreEasy::waitForUser();
 
