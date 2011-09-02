@@ -525,12 +525,18 @@ class App : public OgreEasy::SimpleOgreInit
 				//
 				Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(1);
 				Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_NONE);
-				//Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MIN, Ogre::FO_NONE);
-				//Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MAG, Ogre::FO_NONE);
 
 				//
 				scene = new OgreMaxScene();
 				scene->Load("scene.scene", mWindow, OgreMaxScene::NO_OPTIONS);
+
+				//
+				//Ogre::Light* lLight = scene->GetSceneManager()->createLight();
+				//lLight->setType(Ogre::Light::LT_POINT);
+				//lLight->setDiffuseColour(0.8f, 0.3f, 0.3f); // this will be a red light
+				//lLight->setSpecularColour(1.0f, 1.0f, 1.0f);// color of 'reflected' light
+				//Ogre::SceneNode* lLightSceneNode = scene->GetRootNode()->createChildSceneNode();
+				//lLightSceneNode->attachObject(lLight);
 
 				//
 				Ogre::SceneManager *mgr = scene->GetSceneManager();
@@ -559,8 +565,10 @@ class App : public OgreEasy::SimpleOgreInit
 			try
 			{
 				//
-				if(Mix_PlayMusic(blues, -1) == -1)
-					_d_log_fatal("Mix_PlayMusic(): " << SDL_GetError());
+				#if _d_release
+					if(Mix_PlayMusic(blues, -1) == -1)
+						_d_log_fatal("Mix_PlayMusic(): " << SDL_GetError());
+				#endif
 
 				//
 				;
@@ -654,7 +662,7 @@ int main(int argc, char **argv)
 	app.Run();
 	app.Destroy();
 
-	OgreEasy::waitForUser();
+	//OgreEasy::waitForUser();
 
 	return 0;
 }

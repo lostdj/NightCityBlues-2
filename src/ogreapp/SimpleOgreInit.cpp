@@ -43,7 +43,7 @@
 
 #include "EasyDefines.h"
 
-#include "../Base.h"
+#include "../Config.h"
 
 namespace OgreEasy
 {
@@ -175,10 +175,12 @@ namespace OgreEasy
 			}
 
 			mRoot->restoreConfig();
-			Ogre::ConfigDialog dlg;
-			bool ok = dlg.display();
-			if(ok)
-				mRoot->saveConfig();
+			#if _d_release
+				Ogre::ConfigDialog dlg;
+				bool ok = dlg.display();
+				if(ok)
+					mRoot->saveConfig();
+			#endif
 
 			// STEP 4/ When the RenderSystem is selected, we can initialise the Root. The root can be initialised only when a rendersystem has been selected.
 			{
