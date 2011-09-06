@@ -533,7 +533,7 @@ class App : public OgreEasy::SimpleOgreInit
 				//
 				//Ogre::Light* lLight = scene->GetSceneManager()->createLight();
 				//lLight->setType(Ogre::Light::LT_POINT);
-				//lLight->setDiffuseColour(0.8f, 0.3f, 0.3f); // this will be a red light
+				//lLight->setDiffuseColour(1, 1, 1);
 				//lLight->setSpecularColour(1.0f, 1.0f, 1.0f);// color of 'reflected' light
 				//Ogre::SceneNode* lLightSceneNode = scene->GetRootNode()->createChildSceneNode();
 				//lLightSceneNode->attachObject(lLight);
