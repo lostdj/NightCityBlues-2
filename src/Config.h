@@ -5,7 +5,7 @@
 #include "Base.h"
 
 //
-#define _d_release 1
+#define _d_release 0
 
 //
 #define _d_enable_log_info 1

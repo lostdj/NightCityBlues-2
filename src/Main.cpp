@@ -615,7 +615,7 @@ const float64 Random::MAGIC = 4294967296.0;
 //
 //
 //
-class App : public OgreEasy::SimpleOgreInit
+class App : public OgreEasy::SimpleOgreInit, public Ogre::WindowEventListener
 {
 	public:
 		App(Ogre::String logFileName, Ogre::String cfgFileName, Ogre::String windowCaption)
@@ -676,13 +676,19 @@ class App : public OgreEasy::SimpleOgreInit
 				//lLightSceneNode->attachObject(lLight);
 
 				//
-				Ogre::SceneManager *mgr = scene->GetSceneManager();
-				Ogre::Camera *cam = mgr->getCamera("Camera001");
+				Ogre::Camera *cam = scene->GetSceneManager()->getCamera("Camera001");
+				cam->setAutoAspectRatio(false);
 				Ogre::Viewport *vp = mWindow->addViewport(cam);
 				vp->setAutoUpdated(true);
+				//cam->setAspectRatio((Ogre::Real)vp->getActualWidth() / (Ogre::Real)vp->getActualHeight());
+				_d_log_info("Ratio: " << ((Ogre::Real)vp->getActualWidth() / (Ogre::Real)vp->getActualHeight()));
+
 				mWindow->setActive(true);
 				mWindow->setAutoUpdated(false);
 				mRoot->clearEventTimes();
+
+				//
+				Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
 				//
 				Ogre::MaterialPtr m;
@@ -750,6 +756,7 @@ class App : public OgreEasy::SimpleOgreInit
 				_d_log_info("*-*-* Main loop.");
 
 				//
+				mRoot->clearEventTimes();
 				while(!mWindow->isClosed())
 				{
 					//
@@ -788,12 +795,27 @@ class App : public OgreEasy::SimpleOgreInit
 
 		void Destroy()
 		{
+			Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
+
 			mWindow->removeAllViewports();
 
 			scene->Destroy();
 			scene->GetRootNode()->removeAndDestroyAllChildren();
 
 			//Ogre::ResourceGroupManager::getSingleton().destroyResourceGroup(lNameOfResourceGroup);
+		}
+
+		// WindowEventListener
+		void windowResized(Ogre::RenderWindow* rw)
+		{
+			//scene->GetSceneManager()->getCamera("Camera001")->setAspectRatio((Ogre::Real)mWindow->getViewport(0)->getActualWidth() / (Ogre::Real)mWindow->getViewport(0)->getActualHeight());
+			_d_log_info("Ratio: " << ((Ogre::Real)mWindow->getViewport(0)->getActualWidth() / (Ogre::Real)mWindow->getViewport(0)->getActualHeight()));
+		}
+ 
+		// WindowEventListener
+		void windowClosed(Ogre::RenderWindow* rw)
+		{
+			;
 		}
 
 		#if _d_os_win
