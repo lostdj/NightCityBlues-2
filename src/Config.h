@@ -5,7 +5,7 @@
 #include "Base.h"
 
 //
-#define _d_release 0
+#define _d_release 1
 
 //
 #define _d_enable_log_info 1
@@ -43,7 +43,10 @@
 #define _d_app_np_sleep 5000
 
 //
-#define _d_app_nc_lights_1_fade 5000
+#define _d_app_nc_building_lights_green_blue 0.055
+
+#define _d_app_nc_building_lights_fade_min 5000
+#define _d_app_nc_building_lights_fade_max 7000
 
 //
 #define _d_app_airplane_landing_speed 0.003

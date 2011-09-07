@@ -10,6 +10,10 @@
 #include <OgreRenderWindow.h>
 #include <OgreWindowEventUtilities.h>
 #include <OgreMaterialManager.h>
+#include <OgreEntity.h>
+#include <OgreSubEntity.h>
+#include <OgreMaterial.h>
+#include <OgrePass.h>
 
 // Mad Marx Tutorials.
 #include "ogreapp/EasyDefines.h"
@@ -404,6 +408,26 @@ class TimeMgr
 
 			return SDL_GetTicks() - t;
 		}
+
+		static uint64 getCounter()
+		{
+			#if _d_os_win
+				static LARGE_INTEGER freq;
+				static LARGE_INTEGER ticks;
+
+				if(!freq.QuadPart)
+					::QueryPerformanceFrequency(&freq);
+
+				::QueryPerformanceCounter(&ticks);
+
+				return (uint64)(ticks.QuadPart * (uint64)1000 / freq.QuadPart);
+			#elif _d_posix
+				static timespec t;
+				::clock_gettime(CLOCK_MONOTONIC, &t);
+
+				return ((t.tv_sec * Time::MIL_IN_SECOND) + (t.tv_nsec / Time::NA_IN_MIL));
+			#endif
+		}
 };
 
 //
@@ -427,13 +451,6 @@ class Fade
 		{
 			;
 		}
-
-		//Fade(uint32 fadeMillis, uint32 sleepMillis = 0, bool fadeIn = true, float64 fade = 0)
-		//  : FADE_MILLIS(fadeMillis), SLEEP_MILLIS(sleepMillis),
-		//    fadeIn(true), fade(fadeIn ? 0 : 1), sleep(0)
-		//{
-		//  ;
-		//}
 
 		float64 Calc(uint32 prevTime, uint32 currentTime)
 		{
@@ -472,11 +489,128 @@ class Fade
 			}
 		}
 
+		float64 GetFade()
+		{
+			return fade;
+		}
+
+		Fade& SetFade(float64 fade)
+		{
+			this->fade = fade;
+
+			return *this;
+		}
+
 	private:
 		bool fadeIn;
 		float64 fade;
 		uint32 sleep;
 };
+
+//
+//
+//
+class Random
+{
+	public:
+		static Random RND;
+
+		Random()
+		{
+			reSeed();
+		}
+
+		Random(uint64 seed)
+		{
+			setSeed(seed);
+		}
+
+		uint64 getNewSeed() const
+		{
+			return TimeMgr::getCounter();
+		}
+
+		void reSeed()
+		{
+			setSeed(getNewSeed());
+		}
+
+		void setSeed(uint64 seed)
+		{
+			c = 362436;
+			i = 15;
+
+			if(!seed)
+				seed = getNewSeed();
+
+			uint32 j = (uint32)(seed & 0xFFFFFFFF);
+
+			for(int32 i = 0; i < 16; i++)
+			{
+				j ^= j << 13;
+				j ^= j >> 17;
+				j ^= j << 5;
+				q[i] = j;
+			}
+
+			q[15] = (uint32)(seed ^ (seed >> 32));
+		}
+
+		uint32 rnd()
+		{
+			uint32 x, r = 0xFFFFFFFE;
+			uint64 t, a = 487198574;
+
+			i = (i + 1) & 15;
+			t = a * q[i] + c;
+			c = (uint32)(t >> 32);
+			x = (uint32)(t + c);
+			if(x < c)
+			{
+				x++;
+				c++;
+			}
+
+			return (q[i] = r - x);
+		}
+
+		bool getBool()
+		{
+			return getInt(0, 1) ? true : false;
+		}
+
+		int32 getInt()
+		{
+			return static_cast<int32>(rnd());
+		}
+
+		int32 getInt(uint32 max)
+		{
+			return static_cast<int32>(rnd() / MAGIC * max);
+		}
+
+		int32 getInt(int32 min, int32 max)
+		{
+			if(min > max)
+				min = max - 1;
+
+			return (min + static_cast<int32>(rnd() / MAGIC * (max - min)));
+		}
+
+		float64 getFloat()
+		{
+			return (rnd() / MAGIC);
+		}
+
+	private:
+		static const float64 MAGIC;
+
+		uint32 c, i;
+		uint32 q[16];
+};
+
+Random Random::RND;
+const float64 Random::MAGIC = 4294967296.0;
 
 //
 //
@@ -494,6 +628,9 @@ class App : public OgreEasy::SimpleOgreInit
 		{
 			try
 			{
+				_d_log_info("------------------------");
+				_d_log_info("*-*-* Init.");
+
 				//
 				if(!initOgre())
 				{
@@ -546,6 +683,29 @@ class App : public OgreEasy::SimpleOgreInit
 				mWindow->setActive(true);
 				mWindow->setAutoUpdated(false);
 				mRoot->clearEventTimes();
+
+				//
+				Ogre::MaterialPtr m;
+
+				// Building lights.
+				{
+					m = scene->GetSceneManager()->getEntity("bl-01-01")->getSubEntity(0)->getMaterial()->clone("bl-01");
+					m->getTechnique(0)->getPass(0)->setDiffuse(1, 1, 1, 1);
+					m->getTechnique(0)->getPass(0)->setAmbient(1, _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+					scene->GetSceneManager()->getEntity("bl-01-01")->getSubEntity(0)->setMaterial(m);
+					scene->GetSceneManager()->getEntity("bl-01-02")->getSubEntity(0)->setMaterial(m);
+
+					m = scene->GetSceneManager()->getEntity("bl-02-01")->getSubEntity(0)->getMaterial()->clone("bl-02");
+					m->getTechnique(0)->getPass(0)->setDiffuse(1, 1, 1, 1);
+					m->getTechnique(0)->getPass(0)->setAmbient(1, _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+					scene->GetSceneManager()->getEntity("bl-02-01")->getSubEntity(0)->setMaterial(m);
+					scene->GetSceneManager()->getEntity("bl-02-02")->getSubEntity(0)->setMaterial(m);
+
+					m = scene->GetSceneManager()->getEntity("bl-03-01")->getSubEntity(0)->getMaterial()->clone("bl-03");
+					m->getTechnique(0)->getPass(0)->setDiffuse(1, 1, 1, 1);
+					m->getTechnique(0)->getPass(0)->setAmbient(1, _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+					scene->GetSceneManager()->getEntity("bl-03-01")->getSubEntity(0)->setMaterial(m);
+				}
 			}
 			catch(Ogre::Exception &e)
 			{
@@ -564,23 +724,56 @@ class App : public OgreEasy::SimpleOgreInit
 			//
 			try
 			{
+				_d_log_info("------------------------");
+				_d_log_info("*-*-* Main loop init.");
+
 				//
 				#if _d_release
 					if(Mix_PlayMusic(blues, -1) == -1)
 						_d_log_fatal("Mix_PlayMusic(): " << SDL_GetError());
 				#endif
 
+				// Building lights.
+				Ogre::Pass &bl01mat = *Ogre::MaterialPtr(Ogre::MaterialManager::getSingleton().getByName("bl-01"))->getTechnique(0)->getPass(0);
+				Ogre::Pass &bl02mat = *Ogre::MaterialPtr(Ogre::MaterialManager::getSingleton().getByName("bl-02"))->getTechnique(0)->getPass(0);
+				Ogre::Pass &bl03mat = *Ogre::MaterialPtr(Ogre::MaterialManager::getSingleton().getByName("bl-03"))->getTechnique(0)->getPass(0);
+
+				Fade bl01fade = Fade(Random::RND.getInt(_d_app_nc_building_lights_fade_min, _d_app_nc_building_lights_fade_max), 0, Random::RND.getBool()).SetFade(Random::RND.getFloat());
+				Fade bl02fade = Fade(Random::RND.getInt(_d_app_nc_building_lights_fade_min, _d_app_nc_building_lights_fade_max), 0, Random::RND.getBool()).SetFade(Random::RND.getFloat());
+				Fade bl03fade = Fade(Random::RND.getInt(_d_app_nc_building_lights_fade_min, _d_app_nc_building_lights_fade_max), 0, Random::RND.getBool()).SetFade(Random::RND.getFloat());
+
 				//
-				;
+				TimeMgr::Time prevTime = TimeMgr::GetTicks();
+
+				//
+				_d_log_info("------------------------");
+				_d_log_info("*-*-* Main loop.");
 
 				//
 				while(!mWindow->isClosed())
 				{
+					//
+					const TimeMgr::Time currentTime = TimeMgr::GetTicks();
+					const TimeMgr::Time elapsedTime = currentTime - prevTime;
+
+					//
+					bl01mat.setAmbient(bl01fade.Calc(prevTime, currentTime), _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+					bl02mat.setAmbient(bl02fade.Calc(prevTime, currentTime), _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+					bl03mat.setAmbient(bl03fade.Calc(prevTime, currentTime), _d_app_nc_building_lights_green_blue, _d_app_nc_building_lights_green_blue);
+
+					//
 					mWindow->update(false);
 					mWindow->swapBuffers(true);
 					mRoot->renderOneFrame();
 
+					//
 					Ogre::WindowEventUtilities::messagePump();
+
+					//
+					SDL_Delay(1);
+
+					//
+					prevTime = currentTime;
 				}
 			}
 			catch(Ogre::Exception &e)
