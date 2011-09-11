@@ -808,7 +808,7 @@ class App : public OgreEasy::SimpleOgreInit, public Ogre::WindowEventListener
 		// WindowEventListener
 		void windowResized(Ogre::RenderWindow* rw)
 		{
-			//scene->GetSceneManager()->getCamera("Camera001")->setAspectRatio((Ogre::Real)mWindow->getViewport(0)->getActualWidth() / (Ogre::Real)mWindow->getViewport(0)->getActualHeight());
+			scene->GetSceneManager()->getCamera("Camera001")->setAspectRatio((Ogre::Real)mWindow->getViewport(0)->getActualWidth() / (Ogre::Real)mWindow->getViewport(0)->getActualHeight());
 			_d_log_info("Ratio: " << ((Ogre::Real)mWindow->getViewport(0)->getActualWidth() / (Ogre::Real)mWindow->getViewport(0)->getActualHeight()));
 		}
  
