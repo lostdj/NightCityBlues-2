@@ -14,6 +14,7 @@
 #include <OgreSubEntity.h>
 #include <OgreMaterial.h>
 #include <OgrePass.h>
+#include <OgreMath.h>
 
 // Mad Marx Tutorials.
 #include "ogreapp/EasyDefines.h"
@@ -668,16 +669,18 @@ class App : public OgreEasy::SimpleOgreInit, public Ogre::WindowEventListener
 				scene->Load("scene.scene", mWindow, OgreMaxScene::NO_OPTIONS);
 
 				//
-				//Ogre::Light* lLight = scene->GetSceneManager()->createLight();
-				//lLight->setType(Ogre::Light::LT_POINT);
-				//lLight->setDiffuseColour(1, 1, 1);
-				//lLight->setSpecularColour(1.0f, 1.0f, 1.0f);// color of 'reflected' light
-				//Ogre::SceneNode* lLightSceneNode = scene->GetRootNode()->createChildSceneNode();
-				//lLightSceneNode->attachObject(lLight);
+				Ogre::Light* lLight = scene->GetSceneManager()->createLight();
+				lLight->setType(Ogre::Light::LT_POINT);
+				lLight->setDiffuseColour(1, 1, 1);
+				lLight->setSpecularColour(1.0f, 1.0f, 1.0f);// color of 'reflected' light
+				Ogre::SceneNode* lLightSceneNode = scene->GetRootNode()->createChildSceneNode();
+				lLightSceneNode->attachObject(lLight);
 
 				//
 				Ogre::Camera *cam = scene->GetSceneManager()->getCamera("Camera001");
 				cam->setAutoAspectRatio(false);
+				_d_log_info("!!! FOV: " << cam->getFOVy().valueDegrees());
+				cam->setFOVy(*(new Ogre::Degree(60)));
 				Ogre::Viewport *vp = mWindow->addViewport(cam);
 				vp->setAutoUpdated(true);
 				//cam->setAspectRatio((Ogre::Real)vp->getActualWidth() / (Ogre::Real)vp->getActualHeight());
